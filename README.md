@@ -3,4 +3,4 @@ This repository is a collection of Python scripts that I wrote while I was study
 
 Feel free to give me any feedback or if you want you can also commit any changes to it :D.
 
-<img src="https://github.com/bysecurety/Python/blob/main/pxfuel.jpg"></img>
+<img src="https://github.com/christiangoeschel/Python/blob/main/pxfuel.jpg"></img>
