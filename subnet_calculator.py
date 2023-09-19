@@ -1,9 +1,10 @@
 # Tested on Python Version 3.9
 # Author: Christian Goeschel Ndjomouo
 # Sep 17 2023
-# Description: This program takes a random IPv4 address and Subnet Mask as input
-#              and returns detailed information about the Subnet ID, Subnet range, first and last 
-#              useable host addresses, total number of useable host addresses, broadcast address and CIDR notation
+# Description: This program takes a random IPv4 address, Subnet Mask and/or CIDR as input
+#              Returns detailed information about the Network like the Network ID, Network range, First and Last 
+#              useable host addresses,total amount of hosts, total amount of useable hosts, broadcast address,
+#              Subnet Mask and CIDR notation. More features may be added in the future.
 
 # Import modules
 import sys
