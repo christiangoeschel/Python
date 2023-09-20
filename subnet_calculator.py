@@ -279,5 +279,3 @@ check_input(*input_req())
 
 # Printing all the gathered information
 print_info()
-
-
