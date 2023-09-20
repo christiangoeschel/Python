@@ -60,9 +60,9 @@ def sm_bin_converter(sm_bin):
 
     for i in range(0,32):
 
-        if "1" in sm_bin[i]:
+        if "1" in sm_bin[i]:    # Everytime there is a '1' the counter goes up, the end result equals to the CIDR notation
 
-            sm_counter += 1
+            sm_counter += 1 
 
         else:
             continue
@@ -144,11 +144,11 @@ def calc_net_id(ipv4_bin, counter):
 
     for i in range(0, counter):
 
-        net_id_bin += ipv4_bin[i]
+        net_id_bin += ipv4_bin[i]                       # Will count each bit in the Binary IPv4 and get the network ID part
+                                                        # the amount of time it counts is defined by the counter parameter which is the CIDR notation
+    if len(net_id_bin) < 32:                            
 
-    if len(net_id_bin) < 32:
-
-        net_id_bin += "0" * ( 32 - len(net_id_bin))
+        net_id_bin += "0" * ( 32 - len(net_id_bin))     # Will fill the host part of the Network ID with '0's
 
 
 # This function will create a binary subnet mask from the CIDR notation
@@ -157,16 +157,13 @@ def create_bin_submask(cidr):
     global binary_subnet_mask
 
     if cidr == 0:
+        binary_subnet_mask = "0" * 32   
 
-        binary_subnet_mask = "0" * 32
-
-    elif cidr == 32:
-
-        binary_subnet_mask = "1" * 32
+    elif cidr == 32:                    # CIDR notatin /32
+        binary_subnet_mask = "1" * 32   # This will result in 11111111 11111111 11111111 11111111 => 255.255.255.255
     
     else:
-        
-        binary_subnet_mask = "1" * cidr + "0" * ( 32 - cidr )
+        binary_subnet_mask = "1" * cidr + "0" * ( 32 - cidr )       # Fills as many octets with '1's as the CIDR notation defines, the rest default to '0's
 
 
 # This function will iterate through the Binary IPv4 as many times as submask_counter of the user defined CIDR notation
@@ -190,6 +187,7 @@ def calc_bin(ipv4, submask):
 
     global binary_subnet_mask
     global bin_submask
+    global bin_ipv4
     bin_submask = ""
 
     global submask_counter
@@ -263,7 +261,6 @@ def print_info():
     
     print("\nIPv4 Address:\t\t",ip_input, end="\n\n")
     print("Network ID:\t\t", bin_to_decimal(net_id_bin) , end="\n")
-    
     print("First Host:\t\t", bin_to_decimal(first_host_bin) , end="\n")
     print("Last Host:\t\t", bin_to_decimal(last_host_bin) , end="\n")
     print("Broadcast:\t\t", bin_to_decimal(broadcast_bin) , end="\n")
@@ -271,7 +268,8 @@ def print_info():
     print("CIDR Notation:\t\t", "/" + str(submask_counter), end="\n")
     print("\nTotal Hosts:\t\t", ( 2 ** ( 32 - submask_counter ) ), end="\n")
     print("Total Useable Hosts:\t", ( ( 2 ** ( 32 - submask_counter ) ) - 2 ), end="\n")
-    print("\nNetwork ID in Binary:\t", net_id_bin, end="\n")
+    print("\nIPv4 in Binary:\t\t", bin_ipv4, end="\n")
+    print("Network ID in Binary:\t", net_id_bin, end="\n")
     print("Subnet Mask in Binary:\t", binary_subnet_mask, end="\n")
 
 
