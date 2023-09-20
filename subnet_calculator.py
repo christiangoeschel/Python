@@ -6,15 +6,9 @@
 #              useable host addresses,total amount of hosts, total amount of useable hosts, broadcast address,
 #              Subnet Mask and CIDR notation. More features may be added in the future.
 
-# Import modules
+# Importing needed modules
 import sys
 import re
-
-# Variables
-
-ip_list = []
-submask_list = []
-
 
 # Function to retrieve IP and Subnet Mask
 def input_req():
@@ -24,25 +18,22 @@ def input_req():
 
     ip_input = input("""Please type in an IPv4 address\n
                      [ Allowed format ]
+
                      Standard: XXX.XXX.XXX.XXX\n
                      Type in here: """)
     
     
     sm_input = input("""\nNow, please type in the Subnet Mask.\n
                      [ Allowed formats ]
+
                      Standard: XXX.XXX.XXX.XXX
-                     CIDR: /XX  ( Example: /23 )\n
+                     CIDR: /XX \n
                      Type in here: """)
     
     return ip_input, sm_input
 
 
-
-    
-    
-
 # Function for the splitting of the octects or CIDR notation numeric values from ' . ' or ' / '
-
 def splitter(valid_input):
 
     valid_ip = valid_input[0]
@@ -59,7 +50,6 @@ def splitter(valid_input):
         del valid_sm[0]
 
     return valid_ip, valid_sm
-
 
 
 # This function converts the subnet mask into binary and calculates the CIDR 
@@ -80,12 +70,13 @@ def sm_bin_converter(sm_bin):
     return sm_counter
 
 
-
-
 # This function calculates the first and lost host of the network range
 def calc_hosts_bin(bin_net_id, bin_brdcst, cidr_notation):
 
+    global first_host_bin
+    global last_host_bin
     global cidr
+
     cidr = cidr_notation
 
     if cidr != 32:
@@ -97,117 +88,52 @@ def calc_hosts_bin(bin_net_id, bin_brdcst, cidr_notation):
         first_host_bin = bin_net_id
         last_host_bin = bin_brdcst
 
-    return first_host_bin, last_host_bin
 
+# This function converts all binary octets in to decimal notation
+def bin_to_decimal(binary_value):
 
+    global final_decimal_value
+    global temp_octet_store
 
-
-# This function converts the first and last host binary values into decimal
-def calc_hosts(first_host_bin,last_host_bin):
-
-    global first_host
-    global last_host
-    global first_host_octet
-    global last_host_octet
-
-    first_host_octet = ""
-    last_host_octet = ""
-    first_host = ""
-    last_host = ""
+    final_decimal_value = ""
+    temp_octet_store = ""
 
     for i in range(0,4):
         for binary in range(0,8):
 
-            first_host_octet += first_host_bin[binary]
-            last_host_octet += last_host_bin[binary]
+            temp_octet_store += binary_value[binary]
+        
         
         if i != 3:
 
             # Appending the converted decimal octet
-            first_host += str(int(first_host_octet, 2)) + "."
-            last_host += str(int(last_host_octet, 2)) + "."
+            final_decimal_value += str(int(temp_octet_store, 2)) + "."
+          
             
             # Stripping the leading octets
-            first_host_bin = first_host_bin[8:]
-            last_host_bin = last_host_bin[8:]
+            binary_value = binary_value[8:]
+      
 
             # Clearing the temporary octet store for the next conversion
-            first_host_octet = ""
-            last_host_octet = ""
+            temp_octet_store = ""
             
             continue
+
         else:
 
-            # Appending the converted decimal octet
-            first_host += str(int(first_host_octet, 2))
-            last_host += str(int(last_host_octet, 2))
-            
+           # Appending the converted decimal octet
+            final_decimal_value += str(int(temp_octet_store, 2))
+          
             # Stripping the leading octets
-            first_host_bin = first_host_bin[8:]
-            last_host_bin = last_host_bin[8:]
-
+            binary_value = binary_value[8:]
+      
             # Clearing the temporary octet store for the next conversion
-            first_host_octet = ""
-            last_host_octet = ""
+            temp_octet_store = ""
             
             continue
     
-
-    
-
-    
-
-# This function will convert the network ID and broadcast into decimal notations
-def calc_range(bin_net_id, bin_brdcst):
-
-    global net_id
-    global broadcast
-    global net_id_octet
-    global broadcast_octet
-
-    net_id_octet = ""
-    broadcast_octet = ""
-    net_id = ""
-    broadcast = ""
-
-    for i in range(0,4):
-        for binary in range(0,8):
-
-            net_id_octet += bin_net_id[binary]
-            broadcast_octet += bin_brdcst[binary]
-        
-        if i != 3:
-
-            # Appending the converted decimal octet
-            net_id += str(int(net_id_octet, 2)) + "."
-            broadcast += str(int(broadcast_octet, 2)) + "."
+    return final_decimal_value
             
-            # Stripping the leading octets
-            bin_net_id = bin_net_id[8:]
-            bin_brdcst = bin_brdcst[8:]
-
-            # Clearing the temporary octet store for the next conversion
-            net_id_octet = ""
-            broadcast_octet = ""
-            
-            continue
-        else:
-
-            # Appending the converted decimal octet
-            net_id += str(int(net_id_octet, 2))
-            broadcast += str(int(broadcast_octet, 2))
-            
-            # Stripping the leading octets
-            bin_net_id = bin_net_id[8:]
-            bin_brdcst = bin_brdcst[8:]
-
-            # Clearing the temporary octet store for the next conversion
-            net_id_octet = ""
-            broadcast_octet = ""
-            
-            continue
-    
-
 
 # This function will iterate through the Binary IPv4 as many times as submask_counter of the user defined CIDR notation
 # To get the Network ID
@@ -224,6 +150,23 @@ def calc_net_id(ipv4_bin, counter):
 
         net_id_bin += "0" * ( 32 - len(net_id_bin))
 
+
+# This function will create a binary subnet mask from the CIDR notation
+def create_bin_submask(cidr):
+    
+    global binary_subnet_mask
+
+    if cidr == 0:
+
+        binary_subnet_mask = "0" * 32
+
+    elif cidr == 32:
+
+        binary_subnet_mask = "1" * 32
+    
+    else:
+        
+        binary_subnet_mask = "1" * cidr + "0" * ( 32 - cidr )
 
 
 # This function will iterate through the Binary IPv4 as many times as submask_counter of the user defined CIDR notation
@@ -242,11 +185,10 @@ def calc_broadcast(ipv4_bin, counter):
         broadcast_bin += "1" * ( 32 - len(broadcast_bin))
 
 
-
-
 # Function for calculating the network ID, network range, broadcast, CIDR etc...
 def calc_bin(ipv4, submask):
 
+    global binary_subnet_mask
     global bin_submask
     bin_submask = ""
 
@@ -261,31 +203,28 @@ def calc_bin(ipv4, submask):
         if len(submask) > 3:
             
             # Binary Subnet Mask ( Non CIDR )
-            bin_submask = str('{0:08b}{1:08b}{2:08b}{3:08b}'.format( int(submask[0]), int(submask[1]), int(submask[2]), int(submask[3])  ))
-
-            calc_net_id(bin_ipv4, sm_bin_converter(bin_submask))
-            calc_broadcast(bin_ipv4, sm_bin_converter(bin_submask))
+            bin_submask = str( '{0:08b}{1:08b}{2:08b}{3:08b}'.format( int(submask[0]), int(submask[1]), int(submask[2]), int(submask[3]) ) )
+            binary_subnet_mask = bin_submask
+            calc_net_id(bin_ipv4, sm_bin_converter(bin_submask))        # Calculates the binary version of the Network ID
+            calc_broadcast(bin_ipv4, sm_bin_converter(bin_submask))     # Calculates the binary version of the Broadcast
             
-            # Calculating the first and last hosts binary values and passing the return values to the calc_hosts() function
-            calc_hosts( *calc_hosts_bin(net_id_bin, broadcast_bin, sm_bin_converter(bin_submask) ) )
-            submask_counter = sm_bin_converter(bin_submask)
+            
+            calc_hosts_bin( net_id_bin, broadcast_bin, sm_bin_converter(bin_submask) )  # Calculating the first and last hosts binary values
+            submask_counter = sm_bin_converter(bin_submask)                             # Sets the CIDR notation variable
     
         else:
 
             # This will determine the amount of times the calc_net_id() function will have to iterate through the bin_ipv4
             # in order to get the Network ID
             submask_counter = int(submask[0])
-            calc_net_id(bin_ipv4, submask_counter)
-            calc_broadcast(bin_ipv4, submask_counter)
-
-            # Calculating the first and last hosts binary values and passing the return values to the calc_hosts() function
-            calc_hosts( *calc_hosts_bin(net_id_bin, broadcast_bin, submask_counter ) )
+            calc_net_id(bin_ipv4, submask_counter)                             # Calculates the binary version of the Network ID
+            calc_broadcast(bin_ipv4, submask_counter)                          # Calculates the binary version of the Broadcast
+            calc_hosts_bin(net_id_bin, broadcast_bin, submask_counter )        # Calculating the first and last hosts binary values
+            create_bin_submask(submask_counter)                                # Creates a binary subnet mask
 
     else:
         print("[ FATAL ERROR ] Aborting ...")
         sys.exit()
-
-
 
 
 # Function to check user input validity
@@ -311,7 +250,7 @@ def check_input(ip, sm):
 
     if ip_regex_result and cidr_regex_result or sm_regex_result:
 
-        print("Processing...")
+        print("\n[ Processing ... ]")
         calc_bin( *splitter(user_input) ) # Return the user_input list to the splitter() function for further processing 
 
     else:
@@ -319,27 +258,28 @@ def check_input(ip, sm):
         sys.exit()          # Stopping the program all together
             
 
-
 # This function will gather all the information and print it to standard output
 def print_info():
-
-    print("\nIPv4 Address:",ip_input, end="\n\n")
-    print("Network ID:", net_id, end="\n")
-    print("Subnet Mask:", sm_input, end="\n")
-    print("CIDR Notation:", submask_counter, end="\n")
-    print("First Host:", first_host, end="\n")
-    print("Last Host:", last_host, end="\n")
-    print("Broadcast:", broadcast, end="\n")
-    print("\nTotal Hosts:", ( 2 ** ( 32 - submask_counter ) ), end="\n")
-    print("\nTotal Useable Hosts:", ( ( 2 ** ( 32 - submask_counter ) ) - 2 ), end="\n")
     
-
+    print("\nIPv4 Address:\t\t",ip_input, end="\n\n")
+    print("Network ID:\t\t", bin_to_decimal(net_id_bin) , end="\n")
+    
+    print("First Host:\t\t", bin_to_decimal(first_host_bin) , end="\n")
+    print("Last Host:\t\t", bin_to_decimal(last_host_bin) , end="\n")
+    print("Broadcast:\t\t", bin_to_decimal(broadcast_bin) , end="\n")
+    print("Subnet Mask:\t\t", bin_to_decimal(binary_subnet_mask), end="\n")
+    print("CIDR Notation:\t\t", "/" + str(submask_counter), end="\n")
+    print("\nTotal Hosts:\t\t", ( 2 ** ( 32 - submask_counter ) ), end="\n")
+    print("Total Useable Hosts:\t", ( ( 2 ** ( 32 - submask_counter ) ) - 2 ), end="\n")
+    print("\nNetwork ID in Binary:\t", net_id_bin, end="\n")
+    print("Subnet Mask in Binary:\t", binary_subnet_mask, end="\n")
 
 
 # Calling the check_input function with the return values from input_req() as arguments
 # ' * ' unpacks the return values in their positional order 
 check_input(*input_req())
 
-calc_range(net_id_bin, broadcast_bin)
-
+# Printing all the gathered information
 print_info()
+
+
