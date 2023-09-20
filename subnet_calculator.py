@@ -103,24 +103,19 @@ def bin_to_decimal(binary_value):
 
             temp_octet_store += binary_value[binary]
         
-        
         if i != 3:
-
             # Appending the converted decimal octet
             final_decimal_value += str(int(temp_octet_store, 2)) + "."
           
-            
             # Stripping the leading octets
             binary_value = binary_value[8:]
       
-
             # Clearing the temporary octet store for the next conversion
             temp_octet_store = ""
             
             continue
 
         else:
-
            # Appending the converted decimal octet
             final_decimal_value += str(int(temp_octet_store, 2))
           
